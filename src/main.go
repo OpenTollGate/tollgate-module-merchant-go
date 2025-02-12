@@ -1,12 +1,20 @@
 package main
 
 import (
+	"flag"
 	"context"
 	"fmt"
 	"github.com/nbd-wtf/go-nostr"
 	"github.com/nbd-wtf/go-nostr/nip19"
 	"strconv"
 	"time"
+	"runtime/debug"
+)
+
+var (
+	Version    string
+	CommitHash string
+	BuildTime  string
 )
 
 var relayUrl = "ws://localhost:3334"
@@ -21,7 +29,32 @@ var pubkey, _ = nostr.GetPublicKey(privateKey)
 var nsec, _ = nip19.EncodePrivateKey(privateKey)
 var npub, _ = nip19.EncodePublicKey(pubkey)
 
+
+func getVersionInfo() string {
+    if info, ok := debug.ReadBuildInfo(); ok {
+        for _, setting := range info.Settings {
+            switch setting.Key {
+            case "vcs.revision":
+                CommitHash = setting.Value[:7]
+            case "vcs.time":
+                BuildTime = setting.Value
+            }
+        }
+    }
+    return fmt.Sprintf("Version: %s\nCommit: %s\nBuild Time: %s", 
+        Version, CommitHash, BuildTime)
+}
+
 func main() {
+	// Add a version flag
+	versionFlag := flag.Bool("version", false, "Print version information")
+	flag.Parse()
+
+	if *versionFlag {
+		fmt.Println(getVersionInfo())
+		return
+	}
+
 	fmt.Println("Starting Tollgate - merchant")
 	fmt.Println("privateKey:", privateKey, "/", nsec)
 	fmt.Println("pk:", pubkey, "/", npub)
