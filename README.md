@@ -27,3 +27,6 @@ env GOOS=linux GOARCH=arm64 go build -o merchant -trimpath -ldflags="-s -w"
 # Hint: copy to connected router 
 scp -O merchant root@192.168.1.1:/root/merchant # X.X == Router IP
 ```
+
+## License
+This project is licensed under the GNU General Public License v3.0 - see the [LICENSE](LICENSE) file for details.
