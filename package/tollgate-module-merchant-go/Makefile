@@ -27,7 +27,8 @@ PKG_USE_MIPS16:=0
 GO_PKG:=github.com/OpenTollGate/tollgate-module-merchant-go
 
 include $(INCLUDE_DIR)/package.mk
-include $(TOPDIR)/package/lang/golang-package.mk
+# include $(INCLUDE_DIR)/golang-package.mk
+$(eval $(call GoPackage))
 
 define Package/$(PKG_NAME)
 	SECTION:=net
@@ -62,6 +63,9 @@ define Build/Configure
 endef
 
 define Build/Compile
+	mkdir -p "$(PKG_BUILD_DIR)/.go_work/build/src/github.com/OpenTollGate"
+	ln -sf "$(PKG_BUILD_DIR)" "$(PKG_BUILD_DIR)/.go_work/build/src/github.com/OpenTollGate/tollgate-module-merchant-go"
+
 	cd $(PKG_BUILD_DIR) && \
 	CGO_ENABLED=0 \
 	GOOS=linux \
