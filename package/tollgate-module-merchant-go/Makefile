@@ -67,11 +67,18 @@ define Build/Compile
 	ln -sf "$(PKG_BUILD_DIR)" "$(PKG_BUILD_DIR)/.go_work/build/src/github.com/OpenTollGate/tollgate-module-merchant-go"
 
 	cd $(PKG_BUILD_DIR) && \
+	GO111MODULE=on \
 	CGO_ENABLED=0 \
 	GOOS=linux \
 	GOARCH=arm64 \
-	go build -trimpath \
-		-ldflags "-s -w \
+	GOFLAGS="-mod=readonly -modcacherw" \
+	GOWORK=off \
+	go mod tidy && \
+	go mod vendor && \
+	GODEBUG=netdns=go+1 \
+	go build -v -x -mod=vendor -trimpath \
+		-tags netgo,osusergo \
+		-ldflags "-s -w -extldflags '-static' \
 		-X main.Version=$(PKG_VERSION) \
 		-X main.CommitHash=$(PKG_RELEASE) \
 		-X main.BuildTime=$(shell date -u '+%Y-%m-%d_%I:%M:%S%p')" \
